@@ -258,14 +258,31 @@ exports.getSubscribeAccountForUser = async (req, res) => {
       const yaml = require('js-yaml');
       const clashConfig = appRequire('plugins/webgui/server/clash');
       clashConfig.Proxy = subscribeAccount.server.map(server => {
-        return {
-          cipher: server.method,
-          name: server.subscribeName || server.name,
-          password: String(subscribeAccount.account.password),
-          port: subscribeAccount.account.port + server.shift,
-          server: server.host,
-          type: 'ss'
-        };
+        if(server.comment === 'obfs'){
+          return {
+            cipher: server.method,
+            name: server.subscribeName || server.name,
+            password: String(subscribeAccount.account.password),
+            port: subscribeAccount.account.port + server.shift,
+            server: server.host,
+            type: 'ss',
+            plugin: 'obfs',
+            'plugin-opts': {
+              mode: 'tls',
+              host: 'global.taobao.com'
+            }
+          };
+        }
+        else{
+          return {
+            cipher: server.method,
+            name: server.subscribeName || server.name,
+            password: String(subscribeAccount.account.password),
+            port: subscribeAccount.account.port + server.shift,
+            server: server.host,
+            type: 'ss'
+          };
+        }
       });
       clashConfig['Proxy Group'][0] = {
         name: 'Proxy',
@@ -279,7 +296,11 @@ exports.getSubscribeAccountForUser = async (req, res) => {
     }
     const result = subscribeAccount.server.map(s => {
       if(type === 'shadowrocket') {
-        return 'ss://' + Buffer.from(s.method + ':' + subscribeAccount.account.password + '@' + s.host + ':' + (subscribeAccount.account.port +  + s.shift)).toString('base64') + '#' + (s.subscribeName || s.name);
+        if(s.comment === 'obfs'){
+          return 'ss://' + Buffer.from(s.method + ':' + subscribeAccount.account.password + '@' + s.host + ':' + (subscribeAccount.account.port +  + s.shift)).toString('base64') +'/?plugin=obfs-local%3Bobfs%3Dtls%3Bobfs-host%3Dglobal.taobao.com' + '#' + (s.subscribeName || s.name);
+        } else {
+          return 'ss://' + Buffer.from(s.method + ':' + subscribeAccount.account.password + '@' + s.host + ':' + (subscribeAccount.account.port +  + s.shift)).toString('base64') + '#' + (s.subscribeName || s.name);
+        }
       } else if(type === 'potatso') {
         return 'ss://' + Buffer.from(s.method + ':' + subscribeAccount.account.password + '@' + s.host + ':' + (subscribeAccount.account.port +  + s.shift)).toString('base64') + '#' + (s.subscribeName || s.name);
       } else if(type === 'ssr') {
