@@ -307,7 +307,7 @@ exports.getSubscribeAccountForUser = async (req, res) => {
         const port = subscribeAccount.account.port + server.shift;
         // name = ss, example.com, 8388, encrypt-method=aes-256-gcm, password=pwd, udp-relay=true, tfo=true
         if(server.comment === 'obfs'){
-          data += name + " = ss, " + host + ", " + port + ", " + cipher + ", " + password + ", obfs = tls \n";
+          data += name + " = ss, " + host + ", " + port + ", " + cipher + ", " + password + ", obfs=tls, obfs-host=global.taobao.com \n";
         }
         else{
           data += name + " = ss, " + host + ", " + port + ", " + cipher + ", " + password + "\n";
