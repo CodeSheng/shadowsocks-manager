@@ -5,6 +5,8 @@ const net = require('net');
 const knex = appRequire('init/knex').knex;
 const flowPlugin = appRequire('plugins/flowSaver/flow');
 const moment = require('moment');
+const fs = require('fs');
+const path = require("path");
 
 const formatMacAddress = mac => mac.replace(/-/g, '').replace(/:/g, '').toLowerCase();
 
@@ -147,6 +149,7 @@ const urlsafeBase64 = str => {
   return Buffer.from(str).toString('base64').replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
 };
 
+const surfboardData = fs.readFileSync(path.resolve(__dirname, "surfboard.txt"),"utf8");
 exports.getSubscribeAccountForUser = async (req, res) => {
   try {
     const ssr = req.query.ssr;
@@ -291,8 +294,33 @@ exports.getSubscribeAccountForUser = async (req, res) => {
           return server.subscribeName || server.name;
         }),
       };
-      
+      res.attachment("tuotu.yaml");
       return res.send(yaml.safeDump(clashConfig));
+    }
+    if (type === 'surfboard') {
+      let data = surfboardData + "\n\n\n[Proxy]\n";
+      subscribeAccount.server.map(server => {
+        const name = server.subscribeName || server.name;
+        const cipher = server.method;
+        const password = subscribeAccount.account.password;
+        const host = server.host;
+        const port = subscribeAccount.account.port + server.shift;
+        // name = ss, example.com, 8388, encrypt-method=aes-256-gcm, password=pwd, udp-relay=true, tfo=true
+        if(server.comment === 'obfs'){
+          data += name + " = ss, " + host + ", " + port + ", " + cipher + ", " + password + ", obfs = tls \n";
+        }
+        else{
+          data += name + " = ss, " + host + ", " + port + ", " + cipher + ", " + password + "\n";
+        }
+      });
+      data += "\n[Proxy Group]\n" +
+          "Proxy = select";
+      subscribeAccount.server.map(server => {
+        const name = server.subscribeName || server.name;
+        data += ", " + name;
+      });
+      res.attachment("tuotu.conf");
+      return res.send(data);
     }
     const result = subscribeAccount.server.map(s => {
       if(type === 'shadowrocket') {
