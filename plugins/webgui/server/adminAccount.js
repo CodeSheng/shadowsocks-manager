@@ -307,10 +307,10 @@ exports.getSubscribeAccountForUser = async (req, res) => {
         const port = subscribeAccount.account.port + server.shift;
         // name = ss, example.com, 8388, encrypt-method=aes-256-gcm, password=pwd, udp-relay=true, tfo=true
         if(server.comment === 'obfs'){
-          data += name + " = ss, " + host + ", " + port + ", " + cipher + ", " + password + ", obfs=tls, obfs-host=global.taobao.com \n";
+          data += name + " = custom, " + host + ", " + port + ", " + cipher + ", " + password + ",http://7xpt4s.com1.z0.glb.clouddn.com/SSEncrypt.module, obfs=tls\n";
         }
         else{
-          data += name + " = ss, " + host + ", " + port + ", " + cipher + ", " + password + "\n";
+          data += name + " = custom, " + host + ", " + port + ", " + cipher + ", " + password + ", http://7xpt4s.com1.z0.glb.clouddn.com/SSEncrypt.module\n";
         }
       });
       data += "\n[Proxy Group]\n" +
