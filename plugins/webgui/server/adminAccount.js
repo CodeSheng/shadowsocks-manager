@@ -272,7 +272,7 @@ exports.getSubscribeAccountForUser = async (req, res) => {
             plugin: 'obfs',
             'plugin-opts': {
               mode: 'tls',
-              host: 'global.taobao.com'
+              host: 'download.windowsupdate.com'
             }
           };
         }
@@ -294,7 +294,6 @@ exports.getSubscribeAccountForUser = async (req, res) => {
           return server.subscribeName || server.name;
         }),
       };
-      res.attachment("tuotu.yaml");
       return res.send(yaml.safeDump(clashConfig));
     }
     if (type === 'surfboard') {
@@ -319,7 +318,6 @@ exports.getSubscribeAccountForUser = async (req, res) => {
         const name = server.subscribeName || server.name;
         data += ", " + name;
       });
-      res.attachment("tuotu.conf");
       return res.send(data);
     }
     const result = subscribeAccount.server.map(s => {
